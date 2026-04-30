@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "version": "0.0.1",
+  "name": "IWA",
+  "author": "Beatriz Fontana, Mariana Barbosa de Lima",
+  "description": "Interface Web Adaptativa (Adaptive Web Interface)",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["style.css"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+  "default_popup": "popup.html"
+}
+}
