@@ -3,7 +3,8 @@ body {
     padding: 10px;
     width: 200px;
 }
-#toggleBtnRuler {
+
+.btn-toggle {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
@@ -13,9 +14,12 @@ body {
     cursor: pointer;
     border-radius: 4px;
 }
-#toggleBtnRuler.disable {
+
+.btn-toggle.disable {
     background-color: #d9534f;
 }
+
+
 #colors {
     display: flex;
     flex-wrap: wrap;
@@ -28,3 +32,4 @@ body {
     border-radius: 4px;
     cursor: pointer;
 }
+

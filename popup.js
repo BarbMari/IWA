@@ -1,6 +1,8 @@
+const toggleBtnContrast = document.getElementById("toggleBtnContrast");
 const toggleBtnRuler = document.getElementById("toggleBtnRuler");
 const colorsDiv = document.getElementById("colors");
 
+let contrastActive = false;
 let active = false;
 let currentColor = "rgba(255, 255, 153, 0.25)";
 
@@ -10,7 +12,7 @@ const colors = [
   "rgba(173, 216, 230, 0.25)", // Azul claro
   "rgba(152, 251, 152, 0.25)", // Verde menta
   "rgba(255, 218, 185, 0.25)", // Pêssego
-  "rgba(221, 160, 221, 0.25)"  // Lilás
+  "rgba(221, 160, 221, 0.25)"  // Lilása
 ];
 
 colors.forEach(c => {
@@ -65,8 +67,42 @@ function updateInterface() {
   }
 }
 
-chrome.storage.sync.get(["active", "color"], (data) => {
+toggleBtnContrast.addEventListener("click", async () => {
+  contrastActive = !contrastActive;
+  updateContrastInterface();
+
+  chrome.storage.sync.set({ contrastActive });
+
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+  if (contrastActive) {
+    chrome.scripting.insertCSS({
+      target: { tabId: tab.id },
+      files: ["high_contrast.css"]
+    });
+  } else {
+    chrome.scripting.removeCSS({
+      target: { tabId: tab.id },
+      files: ["high_contrast.css"]
+    });
+  }
+});
+
+function updateContrastInterface() {
+  if (contrastActive) {
+    toggleBtnContrast.textContent = "Desativar Alto Contraste";
+    toggleBtnContrast.classList.add("disable");
+  } else {
+    toggleBtnContrast.textContent = "Ativar Alto Contraste";
+    toggleBtnContrast.classList.remove("disable");
+  }
+}
+
+chrome.storage.sync.get(["active", "color", "contrastActive"], (data) => {
   if (data.color) currentColor = data.color;
   if (data.active) active = true;
+  if (data.contrastActive) contrastActive = true;
+  
   updateInterface();
+  updateContrastInterface();
 });
