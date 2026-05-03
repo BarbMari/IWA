@@ -1,11 +1,11 @@
-const toggleBtn = document.getElementById("toggleBtn");
-const coresDiv = document.getElementById("cores");
+const toggleBtnRuler = document.getElementById("toggleBtnRuler");
+const colorsDiv = document.getElementById("colors");
 
-let ativo = false;
-let corAtual = "rgba(255, 255, 153, 0.25)";
+let active = false;
+let currentColor = "rgba(255, 255, 153, 0.25)";
 
-//cores
-const cores = [
+//colors
+const colors = [
   "rgba(255, 255, 153, 0.25)", // Amarelo suave
   "rgba(173, 216, 230, 0.25)", // Azul claro
   "rgba(152, 251, 152, 0.25)", // Verde menta
@@ -13,60 +13,60 @@ const cores = [
   "rgba(221, 160, 221, 0.25)"  // Lilás
 ];
 
-cores.forEach(c => {
+colors.forEach(c => {
   const btn = document.createElement("button");
-  btn.className = "cor-btn";
+  btn.className = "color-btn";
   btn.style.backgroundColor = c;
   btn.addEventListener("click", () => {
-    corAtual = c;
-    chrome.storage.sync.set({ cor: corAtual });
-    if (ativo) {
-      enviarMensagem("mudarCor", corAtual);
+    currentColor = c;
+    chrome.storage.sync.set({ color: currentColor });
+    if (active) {
+      sendMessage("changeColor", currentColor);
     }
   });
-  coresDiv.appendChild(btn);
+  colorsDiv.appendChild(btn);
 });
 
 //botão de liga e desliga
-toggleBtn.addEventListener("click", async () => {
-  ativo = !ativo;
-  atualizarInterface();
-  chrome.storage.sync.set({ ativo, cor: corAtual });
+toggleBtnRuler.addEventListener("click", async () => {
+  active = !active;
+  updateInterface();
+  chrome.storage.sync.set({ active, color: currentColor });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  if (ativo) {
+  if (active) {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ["content.js"]
     });
-    enviarMensagem("ativar", corAtual);
+    sendMessage("enable", currentColor);
   } else {
-    enviarMensagem("desativar", corAtual);
+    sendMessage("disable", currentColor);
   }
 });
 
 
-function enviarMensagem(acao, cor) {
+function sendMessage(action, color) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { acao, cor });
+    chrome.tabs.sendMessage(tabs[0].id, { action, color });
   });
 }
 
-function atualizarInterface() {
-  if (ativo) {
-    toggleBtn.textContent = "Desativar Régua";
-    toggleBtn.classList.add("desativar");
-    coresDiv.style.display = "flex";
+function updateInterface() {
+  if (active) {
+    toggleBtnRuler.textContent = "Desativar Régua";
+    toggleBtnRuler.classList.add("disable");
+    colorsDiv.style.display = "flex";
   } else {
-    toggleBtn.textContent = "Ativar Régua";
-    toggleBtn.classList.remove("desativar");
-    coresDiv.style.display = "none";
+    toggleBtnRuler.textContent = "Ativar Régua";
+    toggleBtnRuler.classList.remove("disable");
+    colorsDiv.style.display = "none";
   }
 }
 
-chrome.storage.sync.get(["ativo", "cor"], (data) => {
-  if (data.cor) corAtual = data.cor;
-  if (data.ativo) ativo = true;
-  atualizarInterface();
+chrome.storage.sync.get(["active", "color"], (data) => {
+  if (data.color) currentColor = data.color;
+  if (data.active) active = true;
+  updateInterface();
 });

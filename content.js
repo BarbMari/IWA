@@ -1,62 +1,62 @@
 (function() {
-  let regua = null;
+  let ruler = null;
 
-  function criarRegua(cor) {
-    const existente = document.getElementById("regua-leitura");
-    if (existente) {
-      existente.remove();
+  function createRuler(color) {
+    const exists = document.getElementById("reading-ruler");
+    if (exists) {
+      exists.remove();
     }
 
-    regua = document.createElement("div");
-    regua.id = "regua-leitura";
-    regua.style.backgroundColor = cor || "rgba(255, 255, 153, 0.25)";
-    regua.style.position = "fixed";
-    regua.style.left = "0";
-    regua.style.width = "100%";
-    regua.style.height = "40px";
-    regua.style.pointerEvents = "none";
-    regua.style.zIndex = "999999";
-    regua.style.transition = "top 0.05s ease, background-color 0.2s ease";
-    document.body.appendChild(regua);
+    ruler = document.createElement("div");
+    ruler.id = "reading-ruler";
+    ruler.style.backgroundColor = color || "rgba(255, 255, 153, 0.25)";
+    ruler.style.position = "fixed";
+    ruler.style.left = "0";
+    ruler.style.width = "100%";
+    ruler.style.height = "40px";
+    ruler.style.pointerEvents = "none";
+    ruler.style.zIndex = "999999";
+    ruler.style.transition = "top 0.05s ease, background-color 0.2s ease";
+    document.body.appendChild(ruler);
 
-    document.addEventListener("mousemove", moverRegua);
+    document.addEventListener("mousemove", moveRuler);
   }
 
-  function moverRegua(e) {
-    if (regua) {
-      regua.style.top = `${e.clientY - 20}px`;
+  function moveRuler(e) {
+    if (ruler) {
+      ruler.style.top = `${e.clientY - 20}px`;
     }
   }
 
-  function removerRegua() {
-    const existente = document.getElementById("regua-leitura");
-    if (existente) {
-      existente.remove();
+  function removeRuler() {
+    const exists = document.getElementById("reading-ruler");
+    if (exists) {
+      exists.remove();
     }
-    regua = null;
-    document.removeEventListener("mousemove", moverRegua);
+    ruler = null;
+    document.removeEventListener("mousemove", moveRuler);
   }
 
-  function mudarCor(cor) {
-    if (regua) {
-      regua.style.backgroundColor = cor;
+  function changeColor(color) {
+    if (ruler) {
+      ruler.style.backgroundColor = color;
     }
   }
 
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.acao === "ativar") {
-      criarRegua(msg.cor);
-    } else if (msg.acao === "desativar") {
-      removerRegua();
-    } else if (msg.acao === "mudarCor") {
-      mudarCor(msg.cor);
+    if (msg.action === "enable") {
+      createRuler(msg.color);
+    } else if (msg.action === "disable") {
+      removeRuler();
+    } else if (msg.action === "changeColor") {
+      changeColor(msg.color);
     }
   });
 
   //pra ficar no estado salvo
-  chrome.storage.sync.get(["ativo", "cor"], (data) => {
-    if (data.ativo) {
-      criarRegua(data.cor);
+  chrome.storage.sync.get(["active", "color"], (data) => {
+    if (data.active) {
+      createRuler(data.color);
     }
   });
 })();
